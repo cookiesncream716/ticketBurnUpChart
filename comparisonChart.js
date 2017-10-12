@@ -7,6 +7,23 @@ registerPlugin(proto(Gem, function(){
 
 		var test = graph.domNode
 
+		if(ticket.subject.parent === undefined){
+			// this is top level ticket
+			this.parentId = ticket.subject._id
+			console.log('parentId = ' + this.parentId)
+			api.Ticket.search({parent: ticket.subject._id}).then(function(children){
+				this.children = children	
+			}).done()
+		} else{
+			this.parentId = ticket.subject.parent
+			console.log('parentId ' + this.parentId)
+			api.Ticket.search({parent: ticket.subject.parent}).then(function(children){
+				this.children = children
+			}).done()
+		}
+
+
+
 		var line1 = {
 			x: [1, 2, 3, 4, 5],
 			y: [1, 3, 5, 7, 9],
@@ -20,8 +37,8 @@ registerPlugin(proto(Gem, function(){
 		var data = [line1, line2]
 
 		var layout = {
-			xaxis: {title: 'Completed'},
-			yaxis: {title: 'Open'},
+			xaxis: {title: 'Date'},
+			yaxis: {title: 'Number of Tickets'},
 			margin: {t: 5}
 		}
 
