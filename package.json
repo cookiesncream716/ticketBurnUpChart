@@ -1,0 +1,7 @@
+{
+  "name": "comparisonChart",
+  "description": "plugin for Tixit to show total tickets vs open tickets on a project",
+  "dependencies": {
+    "build-modules": "^2.2.0"
+  }
+}
