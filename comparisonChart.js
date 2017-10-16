@@ -9,16 +9,18 @@ registerPlugin(proto(Gem, function(){
 		var test = graph.domNode
 
 		var children = []
-		// children = [{created: date, completed: date or 0 for open}]
+		// children = [{created: date, completed: date or now+1 for open}]
 		// created date - history[0].date
 		// completed date - if archived true or if done true (date in history that done went from false to true)
+		var parentId
+		var startDate
+		var now = 	Math.round(new Date().getTime()/1000.0)
 
 		if(ticket.subject.parent === undefined){
 			// this is top level ticket
-			this.parentId = ticket.subject._id
-			this.startDate = ticket.subject.history[0].date
+			parentId = ticket.subject._id
+			startDate = ticket.subject.history[0].date
 			api.Ticket.search({parent: ticket.subject._id}).then(function(childTickets){
-				// that.kids = childTickets
 				childTickets.forEach(function(child){
 					data = {}
 					data['created'] = child.subject.history[0].date
@@ -35,75 +37,84 @@ registerPlugin(proto(Gem, function(){
 							}
 						}
 					} else{
-						data['completed'] = 0
+						data['completed'] = now + 1
 					}
 					children.push(data)
 				})	
 			}).done()
 		} else{
-			this.parentId = ticket.subject.parent
-			console.log('parentId ' + this.parentId)
+			parentId = ticket.subject.parent
+			console.log('parentId ' + parentId)
 			api.Ticket.search({parent: ticket.subject.parent}).then(function(childTickets){
 				that.kids = childTickets
 			}).done()
 		}
 
 		// hard code some data to see how this works
-		this.startDate = 1
+		startDate = 1
 		var now = 50
-		children = [{'created': 1}, {'created': 9}, {'created': 13}, {'created': 18}, {'created': 22}, {'created': 26}, {'created': 35}, {'created': 41}, {'created': 49}, {'created': 50}]
-		var a = 0
-		var b = 0
-		var c = 0
-		var d = 0
-		var e = 0
-		// var e = d = c = b = a = 0
-		// var now = 	Math.round(new Date().getTime()/1000.0)
-		console.log('now=' + now)
-		console.log(children)
+		children = [{'created': 1, 'completed': 18}, {'created': 9, 'completed': 14}, {'created': 13, 'completed': 60}, {'created': 18, 'completed': 33}, {'created': 22, 'completed': 60}, {'created': 26, 'completed': 45}, {'created': 35,'completed': 48}, {'created': 41, 'completed': 42}, {'created': 49, 'completed': 60}, {'created': 50, 'completed': 60}]
+		// children = [{'created': 1, 'completed': 3}, {'created': 3, 'completed': 8}, {'created': 12, 'completed': 60}, {'created': 18, 'completed': 28}, {'created': 41, 'completed': 60}]
+		// console.log(children)
+		var xAxis = [startDate, (startDate + (now-startDate)/4), (startDate + 2*((now-startDate)/4)), (startDate + 3*((now-startDate)/4)), now]
+		// var xAxis = [1, 10, 20, 30,50]
+		var y1 = [0, 0, 0, 0, 0]
+		var y2 = [0, 0, 0, 0, 0]
 		children.forEach(function(child){
-			console.log('for each ', child)
-			if(child['created'] <= that.startDate){
-				a++
+			if(child['created'] <= xAxis[0]){
+				y1[0]++
+				if(child['completed'] >= xAxis[0]){
+					y2[0]++
+				}
 			}
-			if(child['created'] <= (that.startDate + (now-that.startDate)/4)){
-				b++
+			if(child['created'] <= xAxis[1]){
+				y1[1]++
+				if(child['completed'] >= xAxis[1]){
+					y2[1]++
+				}
 			}
-			 // (1 + 2*((50-1)/4))
-			if(child['created'] <= (that.startDate + 2*((now-that.startDate)/4))){
-				c++
+			if(child['created'] <= xAxis[2]){
+				y1[2]++
+				if(child['completed'] >= xAxis[2]){
+					y2[2]++
+				}
 			}
-			if(child['created'] <= (that.startDate + 3*((now-that.startDate)/4))){
-				d++
+			if(child['created'] <= xAxis[3]){
+				y1[3]++
+				if(child['completed'] >= xAxis[3]){
+					y2[3]++
+				}
 			}
-			if(child['created'] <= now){
-				e++
+			if(child['created'] <= xAxis[4]){
+				y1[4]++
+				if(child['completed'] >= xAxis[4]){
+					y2[4]++
+				}
 			}
 		})
-		console.log('a=' + a)
-		console.log('b=' + b)
-		console.log('c=' + c)
-		console.log('d=' + d)
-		console.log('e=' + e)
-
+		console.log('xAxis=' + xAxis)
+		console.log('open y2=' + y2)
+		console.log('total y1=' + y1)
 		var line1 = {
-			x: [1, 2, 3, 4, 5],
-			y: [1, 3, 5, 7, 9],
-			type: 'scatter',
-			name: 'Open Tickets'
-		}
-		var line2 = {
-			x: [this.startDate, (this.startDate + (now-this.startDate)/4), (this.startDate + 2*((now-that.startDate)/4)), (this.startDate + 3*((now-that.startDate)/4)), now],
-			y: [a, b, c, d, e],
+			x: xAxis,
+			y: y1,
 			type: 'scatter',
 			name: 'Total Tickets'
 		}
-		var data = [line2]
+
+		var line2 = {
+			x: xAxis,
+			y: y2,
+			type: 'scatter',
+			name: 'Open Tickets'
+		}
+
+		var data = [line1, line2]
 
 		var layout = {
 			xaxis: {title: 'Date'},
 			yaxis: {title: 'Tickets'},
-			margin: {t: 5}
+			margin: {t:23}
 		}
 
 		Plotly.newPlot(test, data, layout)
