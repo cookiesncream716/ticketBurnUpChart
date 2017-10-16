@@ -16,15 +16,24 @@ registerPlugin(proto(Gem, function(){
 		if(ticket.subject.parent === undefined){
 			// this is top level ticket
 			this.parentId = ticket.subject._id
-			console.log('parentId = ' + this.parentId)
 			this.startDate = ticket.subject.history[0].date
 			api.Ticket.search({parent: ticket.subject._id}).then(function(childTickets){
-				that.kids = childTickets
+				// that.kids = childTickets
 				childTickets.forEach(function(child){
 					data = {}
 					data['created'] = child.subject.history[0].date
+					// console.log(child.subject.history)
 					if(child.subject.done === true || child.subject.archived === true){
-						data['completed'] = 
+						// console.log('completed')
+						// checks most recent first
+						for(var i=child.subject.history.length-1; i>=0; i--){
+							// code runs but I don't know if fields are labeled correctly
+							if(child.subject.history[i].field === 'done' || child.subject.history[i].field === 'archived'){
+								data['completed'] = child.subject.history[i].date
+								// stop loop if field = done or archived
+								break
+							}
+						}
 					} else{
 						data['completed'] = 0
 					}
@@ -39,6 +48,43 @@ registerPlugin(proto(Gem, function(){
 			}).done()
 		}
 
+		// hard code some data to see how this works
+		this.startDate = 1
+		var now = 50
+		children = [{'created': 1}, {'created': 9}, {'created': 13}, {'created': 18}, {'created': 22}, {'created': 26}, {'created': 35}, {'created': 41}, {'created': 49}, {'created': 50}]
+		var a = 0
+		var b = 0
+		var c = 0
+		var d = 0
+		var e = 0
+		// var e = d = c = b = a = 0
+		// var now = 	Math.round(new Date().getTime()/1000.0)
+		console.log('now=' + now)
+		console.log(children)
+		children.forEach(function(child){
+			console.log('for each ', child)
+			if(child['created'] <= that.startDate){
+				a++
+			}
+			if(child['created'] <= (that.startDate + (now-that.startDate)/4)){
+				b++
+			}
+			 // (1 + 2*((50-1)/4))
+			if(child['created'] <= (that.startDate + 2*((now-that.startDate)/4))){
+				c++
+			}
+			if(child['created'] <= (that.startDate + 3*((now-that.startDate)/4))){
+				d++
+			}
+			if(child['created'] <= now){
+				e++
+			}
+		})
+		console.log('a=' + a)
+		console.log('b=' + b)
+		console.log('c=' + c)
+		console.log('d=' + d)
+		console.log('e=' + e)
 
 		var line1 = {
 			x: [1, 2, 3, 4, 5],
@@ -47,8 +93,8 @@ registerPlugin(proto(Gem, function(){
 			name: 'Open Tickets'
 		}
 		var line2 = {
-			x: [this.startDate],
-			y: [this.kids.length],
+			x: [this.startDate, (this.startDate + (now-this.startDate)/4), (this.startDate + 2*((now-that.startDate)/4)), (this.startDate + 3*((now-that.startDate)/4)), now],
+			y: [a, b, c, d, e],
 			type: 'scatter',
 			name: 'Total Tickets'
 		}

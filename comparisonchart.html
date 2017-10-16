@@ -18,7 +18,7 @@
 				children.forEach(function(child, i){
 					// child.subject.history.date = Math.round(new Date('10-' + i + '-17').getTime()/1000.0)
 					child.subject.history.user = 'demoUser1'
-					child.subject.history.date = new Date('10-'+i+'-17')
+					child.subject.history.date = new Date('10-'+(i+1)+'-17')
 				})
 				PluginTester('ticketGraph', {}, {ticketId: parentTicket.subject._id, showEditor: true})
 				// PluginTester('ticketGraph', {}, {ticketId: children[0].subject._id, showEditor: true})
