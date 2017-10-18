@@ -32,7 +32,7 @@ registerPlugin(proto(Gem, function(){
 			var parentId = ticket.subject.parent
 			console.log('else parentId ' + parentId)
 			api.Ticket.loadOne(parentId).then(function(parent){
-				this.startDate = parent.subject.history[0].date
+				that.startDate = parent.subject.history[0].date
 				console.log('parent ' , parent)
 			}).done()
 			this.createData(ticket.subject.parent).then(function(){
