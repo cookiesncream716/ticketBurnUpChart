@@ -11,69 +11,39 @@ registerPlugin(proto(Gem, function(){
 		var graph = Block()
 		this.add(graph)
 
-		var test = graph.domNode
+		this.chart = graph.domNode
 
 		this.children = []
-		// children = [{created: date, completed: date or now+1 for open}]
+		// children = [{created: date, completed: date or now+10 for open}]
 		// created date - history[0].date
-		// completed date - if archived true or if done true (date in history that done went from false to true)
-		var startDate
+		// completed date - (if archived true or if done true) date in history that done went from false to true
+		this.startDate
 		this.now = 	Math.round(new Date().getTime()/1000.0)
 
 		if(ticket.subject.parent === undefined){
 			// this is top level ticket
 			console.log('ticket ', ticket)
 			var parentId = ticket.subject._id
-			startDate = ticket.subject.history[0].date
-			this.createData(ticket.subject._id).done()
-			// api.Ticket.search({parent: ticket.subject._id}).then(function(childTickets){
-			// 	childTickets.forEach(function(child){
-			// 		that.createData(child)
-			// 		// var data = {}
-			// 		// data['created'] = child.subject.history[0].date
-			// 		// // console.log(child.subject.history)
-			// 		// if(child.subject.done === true || child.subject.archived === true){
-			// 		// 	// console.log('completed')
-			// 		// 	// checks most recent first
-			// 		// 	for(var i=child.subject.history.length-1; i>=0; i--){
-			// 		// 		// code runs but I don't know if fields are labeled correctly
-			// 		// 		if(child.subject.history[i].field === 'done' || child.subject.history[i].field === 'archived'){
-			// 		// 			data['completed'] = child.subject.history[i].date
-			// 		// 			// stop loop if field = done or archived
-			// 		// 			break
-			// 		// 		}
-			// 		// 	}
-			// 		// } else{
-			// 		// 	data['completed'] = now + 1
-			// 		// }
-			// 		// this.children.push(data)
-			// 	})	
-			// }).done()
+			this.startDate = ticket.subject.history[0].date
+			this.createData(ticket.subject._id).then(function(){
+				that.createGraph()
+			}).done()
 		} else{
 			var parentId = ticket.subject.parent
 			console.log('else parentId ' + parentId)
 			api.Ticket.loadOne(parentId).then(function(parent){
-				startDate = parent.subject.history[0].date
+				this.startDate = parent.subject.history[0].date
 				console.log('parent ' , parent)
 			}).done()
-			this.createData(ticket.subject.parent).done()
-			// api.Ticket.search({parent: ticket.subject.parent}).then(function(childTickets){
-			// 	childTickets.forEach(function(child){
-			// 		that.createData(child)
-			// 	})
-			// }).done()
+			this.createData(ticket.subject.parent).then(function(){
+				that.createGraph()
+			}).done()
 		}
+	}
 
-		// hard code some data to see how this works
-		// startDate = 1
-		// this.now = 50
-		// this.children = [{'created': 1, 'completed': 18}, {'created': 9, 'completed': 14}, {'created': 13, 'completed': 60}, {'created': 18, 'completed': 33}, {'created': 22, 'completed': 60}, {'created': 26, 'completed': 45}, {'created': 35,'completed': 48}, {'created': 41, 'completed': 42}, {'created': 49, 'completed': 60}, {'created': 50, 'completed': 60}]
-		// children = [{'created': 1, 'completed': 3}, {'created': 3, 'completed': 8}, {'created': 12, 'completed': 60}, {'created': 18, 'completed': 28}, {'created': 41, 'completed': 60}]
-		// console.log(children)
-
+	this.createGraph = function(){
 		// will need to figure out how to decide how many points to plot
-		var xAxis = [startDate, (startDate + (this.now-startDate)/4), (startDate + 2*((this.now-startDate)/4)), (startDate + 3*((this.now-startDate)/4)), this.now]
-		// var xAxis = [1, 10, 20, 30,50]
+		var xAxis = [this.startDate, (this.startDate + (this.now-this.startDate)/4), (this.startDate + 2*((this.now-this.startDate)/4)), (this.startDate + 3*((this.now-this.startDate)/4)), this.now]
 		var y1 = [0, 0, 0, 0, 0]
 		var y2 = [0, 0, 0, 0, 0]
 		console.log('children ' , this.children)
@@ -131,7 +101,7 @@ registerPlugin(proto(Gem, function(){
 			yaxis: {title: 'Tickets'},
 			margin: {t:23}
 		}
-		plotly.newPlot(test, lines, layout)
+		plotly.newPlot(this.chart, lines, layout)
 	}
 
 	this.createData = function(id){
