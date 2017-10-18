@@ -6,6 +6,8 @@ registerPlugin(proto(Gem, function(){
 
 	this.build = function(ticket, optionsObservee, api){
 		var that = this
+		this.api = api
+
 		var graph = Block()
 		this.add(graph)
 
@@ -20,42 +22,46 @@ registerPlugin(proto(Gem, function(){
 
 		if(ticket.subject.parent === undefined){
 			// this is top level ticket
+			console.log('ticket ', ticket)
 			var parentId = ticket.subject._id
 			startDate = ticket.subject.history[0].date
-			api.Ticket.search({parent: ticket.subject._id}).then(function(childTickets){
-				childTickets.forEach(function(child){
-					that.createData(child)
-					// var data = {}
-					// data['created'] = child.subject.history[0].date
-					// // console.log(child.subject.history)
-					// if(child.subject.done === true || child.subject.archived === true){
-					// 	// console.log('completed')
-					// 	// checks most recent first
-					// 	for(var i=child.subject.history.length-1; i>=0; i--){
-					// 		// code runs but I don't know if fields are labeled correctly
-					// 		if(child.subject.history[i].field === 'done' || child.subject.history[i].field === 'archived'){
-					// 			data['completed'] = child.subject.history[i].date
-					// 			// stop loop if field = done or archived
-					// 			break
-					// 		}
-					// 	}
-					// } else{
-					// 	data['completed'] = now + 1
-					// }
-					// this.children.push(data)
-				})	
-			}).done()
+			this.createData(ticket.subject._id).done()
+			// api.Ticket.search({parent: ticket.subject._id}).then(function(childTickets){
+			// 	childTickets.forEach(function(child){
+			// 		that.createData(child)
+			// 		// var data = {}
+			// 		// data['created'] = child.subject.history[0].date
+			// 		// // console.log(child.subject.history)
+			// 		// if(child.subject.done === true || child.subject.archived === true){
+			// 		// 	// console.log('completed')
+			// 		// 	// checks most recent first
+			// 		// 	for(var i=child.subject.history.length-1; i>=0; i--){
+			// 		// 		// code runs but I don't know if fields are labeled correctly
+			// 		// 		if(child.subject.history[i].field === 'done' || child.subject.history[i].field === 'archived'){
+			// 		// 			data['completed'] = child.subject.history[i].date
+			// 		// 			// stop loop if field = done or archived
+			// 		// 			break
+			// 		// 		}
+			// 		// 	}
+			// 		// } else{
+			// 		// 	data['completed'] = now + 1
+			// 		// }
+			// 		// this.children.push(data)
+			// 	})	
+			// }).done()
 		} else{
 			var parentId = ticket.subject.parent
-			console.log('parentId ' + parentId)
-			api.Ticket.findOne(parentId).then(function(parent){
+			console.log('else parentId ' + parentId)
+			api.Ticket.loadOne(parentId).then(function(parent){
 				startDate = parent.subject.history[0].date
+				console.log('parent ' , parent)
 			}).done()
-			api.Ticket.search({parent: ticket.subject.parent}).then(function(childTickets){
-				childTickets.forEach(function(child){
-					that.createData(child)
-				})
-			}).done()
+			this.createData(ticket.subject.parent).done()
+			// api.Ticket.search({parent: ticket.subject.parent}).then(function(childTickets){
+			// 	childTickets.forEach(function(child){
+			// 		that.createData(child)
+			// 	})
+			// }).done()
 		}
 
 		// hard code some data to see how this works
@@ -64,10 +70,13 @@ registerPlugin(proto(Gem, function(){
 		// this.children = [{'created': 1, 'completed': 18}, {'created': 9, 'completed': 14}, {'created': 13, 'completed': 60}, {'created': 18, 'completed': 33}, {'created': 22, 'completed': 60}, {'created': 26, 'completed': 45}, {'created': 35,'completed': 48}, {'created': 41, 'completed': 42}, {'created': 49, 'completed': 60}, {'created': 50, 'completed': 60}]
 		// children = [{'created': 1, 'completed': 3}, {'created': 3, 'completed': 8}, {'created': 12, 'completed': 60}, {'created': 18, 'completed': 28}, {'created': 41, 'completed': 60}]
 		// console.log(children)
+
+		// will need to figure out how to decide how many points to plot
 		var xAxis = [startDate, (startDate + (this.now-startDate)/4), (startDate + 2*((this.now-startDate)/4)), (startDate + 3*((this.now-startDate)/4)), this.now]
 		// var xAxis = [1, 10, 20, 30,50]
 		var y1 = [0, 0, 0, 0, 0]
 		var y2 = [0, 0, 0, 0, 0]
+		console.log('children ' , this.children)
 		this.children.forEach(function(child){
 			if(child['created'] <= xAxis[0]){
 				y1[0]++
@@ -101,24 +110,22 @@ registerPlugin(proto(Gem, function(){
 			}
 		})
 		console.log('xAxis=' + xAxis)
-		console.log('open y2=' + y2)
 		console.log('total y1=' + y1)
+		console.log('open y2=' + y2)
+
 		var line1 = {
 			x: xAxis,
 			y: y1,
 			type: 'scatter',
 			name: 'Total Tickets'
 		}
-
 		var line2 = {
 			x: xAxis,
 			y: y2,
 			type: 'scatter',
 			name: 'Open Tickets'
 		}
-
 		var lines = [line1, line2]
-
 		var layout = {
 			xaxis: {title: 'Date'},
 			yaxis: {title: 'Tickets'},
@@ -127,21 +134,29 @@ registerPlugin(proto(Gem, function(){
 		plotly.newPlot(test, lines, layout)
 	}
 
-	this.createData = function(child){
-		var data = {}
-		data['created'] = child.subject.history[0].date
-		if(child.subject.done === true || child.subject.archived === true){
-			for(var i=child.subject.history.length-1; i>=0; i--){
-				if(child.subject.history[i].field === 'done' || child.subject.history[i].field === 'archived'){
-					data['completed'] = child.subject.history[i].date
-					break
+	this.createData = function(id){
+		var that = this
+		console.log('this.createData')
+		return this.api.Ticket.search({parent: id}).then(function(childTickets){
+			childTickets.forEach(function(child){
+				console.log('child ', child)
+				var data = {}
+				data['created'] = child.subject.history[0].date
+				if(child.subject.done === true || child.subject.archived === true){
+					for(var i=child.subject.history.length-1; i>=0; i--){
+						if(child.subject.history[i].field === 'done' || child.subject.history[i].field === 'archived'){
+							data['completed'] = child.subject.history[i].date
+							break
+						}
+					}
+				} else{
+					data['completed'] = that.now + 10
 				}
-			}
-		} else{
-			data['completed'] = this.now + 1
-		}
-		this.children.push(data)
+				that.children.push(data)
+			})
+		})
 	}
+
 	this.getStyle = function(){
 		return Style({
 			Block: {
