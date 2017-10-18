@@ -95,33 +95,26 @@ registerPlugin(proto(Gem, function(){
 
 		var graph = Block()
 		this.add(graph)
-
 		this.chart = graph.domNode
-
 		this.children = []
 		// children = [{created: date, completed: date or now+10 for open}]
 		// created date - history[0].date
 		// completed date - (if archived true or if done true) date in history that done went from false to true
 		this.startDate
-		this.now = 	Math.round(new Date().getTime()/1000.0)
+		this.now = Math.round(new Date().getTime()/1000.0)
 
 		if(ticket.subject.parent === undefined){
 			// this is top level ticket
-			console.log('ticket ', ticket)
-			var parentId = ticket.subject._id
 			this.startDate = ticket.subject.history[0].date
 			this.createData(ticket.subject._id).then(function(){
-				that.createGraph()
+				return that.createGraph()
 			}).done()
 		} else{
-			var parentId = ticket.subject.parent
-			console.log('else parentId ' + parentId)
-			api.Ticket.loadOne(parentId).then(function(parent){
+			api.Ticket.loadOne(ticket.subject.parent).then(function(parent){
 				that.startDate = parent.subject.history[0].date
-				console.log('parent ' , parent)
-			}).done()
-			this.createData(ticket.subject.parent).then(function(){
-				that.createGraph()
+				return that.createData(ticket.subject.parent)
+			}).then(function(){
+				return that.createGraph()
 			}).done()
 		}
 	}
@@ -191,10 +184,8 @@ registerPlugin(proto(Gem, function(){
 
 	this.createData = function(id){
 		var that = this
-		console.log('this.createData')
 		return this.api.Ticket.search({parent: id}).then(function(childTickets){
 			childTickets.forEach(function(child){
-				console.log('child ', child)
 				var data = {}
 				data['created'] = child.subject.history[0].date
 				if(child.subject.done === true || child.subject.archived === true){
@@ -225,12 +216,6 @@ registerPlugin(proto(Gem, function(){
 
 // Total tickets vs Open tickets
 	// total - # of children tickets created by that date
-
-// Steps
-// 1 - get id of parent ticket
-// 2 - get children tickets of that parent ticket
-// 3 - get dates of when each child ticket created
-// 4 - get dates of each child ticket completed
 
 // Linux TimeStamp 
 // https://www.epochconverter.com/
