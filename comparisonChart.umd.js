@@ -102,6 +102,7 @@ registerPlugin(proto(Gem, function(){
 		// completed date - (if archived true or if done true) date in history that done went from false to true
 		this.startDate
 		this.now = Math.round(new Date().getTime()/1000.0)
+		console.log('now = ', this.now)
 
 		if(ticket.subject.parent === undefined){
 			// this is top level ticket
@@ -118,10 +119,16 @@ registerPlugin(proto(Gem, function(){
 			}).done()
 		}
 	}
-
+// this.startDate = (new Date(ticket.subject.history[0].date * 1000).getMonth()+1) + '/' + new Date(ticket.subject.history[0].date * 1000).getDate() + '/' + new Date(ticket.subject.history[0].date * 1000).getFullYear()
 	this.createGraph = function(){
 		// will need to figure out how to decide how many points to plot
-		var xAxis = [this.startDate, (this.startDate + (this.now-this.startDate)/4), (this.startDate + 2*((this.now-this.startDate)/4)), (this.startDate + 3*((this.now-this.startDate)/4)), this.now]
+		var xAxis = [
+			this.startDate,
+			(this.startDate + (this.now-this.startDate)/4),
+			(this.startDate + 2*((this.now-this.startDate)/4)),
+			(this.startDate + 3*((this.now-this.startDate)/4)),
+			this.now
+			]
 		var y1 = [0, 0, 0, 0, 0]
 		var y2 = [0, 0, 0, 0, 0]
 		console.log('children ' , this.children)
@@ -157,6 +164,14 @@ registerPlugin(proto(Gem, function(){
 				}
 			}
 		})
+		var today = this.startDate * 1000
+		xAxis = [
+			(new Date(today).getMonth()+1) + '/' + new Date(today).getDate() + '/' + new Date(today).getFullYear(),
+			(new Date(today+(this.now-this.startDate)/4).getMonth()+1) + '/' + new Date(today+(this.now-this.startDate)/4).getDate() + '/' + new Date(today+(this.now-this.startDate)/4).getFullYear(),
+			(new Date(today+2*((this.now-this.startDate)/4)).getMonth()+1) + '/' + new Date(today+2*((this.now-this.startDate)/4)).getDate() + '/' + new Date(today+2*((this.now-this.startDate)/4)).getFullYear(),
+			(new Date(today+3*((this.now-this.startDate)/4)).getMonth()+1) + '/' + new Date(today+3*((this.now-this.startDate)/4)).getDate() + '/' + new Date(today+3*((this.now-this.startDate)/4)).getFullYear(),
+			(new Date(this.now*1000).getMonth()+1) + '/' + new Date(this.now*1000).getDate() + '/' + new Date(this.now*1000).getFullYear()
+			]
 		console.log('xAxis=' + xAxis)
 		console.log('total y1=' + y1)
 		console.log('open y2=' + y2)
