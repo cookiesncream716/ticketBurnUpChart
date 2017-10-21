@@ -119,59 +119,44 @@ registerPlugin(proto(Gem, function(){
 			}).done()
 		}
 	}
-// this.startDate = (new Date(ticket.subject.history[0].date * 1000).getMonth()+1) + '/' + new Date(ticket.subject.history[0].date * 1000).getDate() + '/' + new Date(ticket.subject.history[0].date * 1000).getFullYear()
+
 	this.createGraph = function(){
-		// will need to figure out how to decide how many points to plot
-		var xAxis = [
-			this.startDate,
-			(this.startDate + (this.now-this.startDate)/4),
-			(this.startDate + 2*((this.now-this.startDate)/4)),
-			(this.startDate + 3*((this.now-this.startDate)/4)),
-			this.now
-			]
-		var y1 = [0, 0, 0, 0, 0]
-		var y2 = [0, 0, 0, 0, 0]
-		console.log('children ' , this.children)
+		// FOR WEEKLY PLOT
+		// epoch time week = 604,800 seconds
+		// # of weeks
+		var weeks = Math.round((this.now-this.startDate)/604800)
+		console.log('weeks = ' + weeks)
+		// xAxis.length = weeks
+		var xAxis = [this.startDate]
+		var y1 = [0]
+		var y2 = [0]
+		// var xAxis = [
+		// 	this.startDate,
+		// 	(this.startDate + (this.now-this.startDate)/4),
+		// 	(this.startDate + 2*((this.now-this.startDate)/4)),
+		// 	(this.startDate + 3*((this.now-this.startDate)/4)),
+		// 	this.now
+		// 	]
+		for(var x=1; x<weeks; x++){
+			xAxis.push(this.startDate + x*((this.now-this.startDate)/(weeks-1)))
+			y1.push(0)
+			y2.push(0)
+		}
+		// need to have as many if statements as weeks-1
 		this.children.forEach(function(child){
-			if(child['created'] <= xAxis[0]){
-				y1[0]++
-				if(child['completed'] >= xAxis[0]){
-					y2[0]++
+			console.log('child ' , child)
+			var count = 0
+			while(count < weeks){
+				console.log('count ' + count)
+				if(child['created'] <= xAxis[count]){
+					y1[count]++
+					if(child['completed'] >= xAxis[count]){
+						y2[count]++
+					}
 				}
-			}
-			if(child['created'] <= xAxis[1]){
-				y1[1]++
-				if(child['completed'] >= xAxis[1]){
-					y2[1]++
-				}
-			}
-			if(child['created'] <= xAxis[2]){
-				y1[2]++
-				if(child['completed'] >= xAxis[2]){
-					y2[2]++
-				}
-			}
-			if(child['created'] <= xAxis[3]){
-				y1[3]++
-				if(child['completed'] >= xAxis[3]){
-					y2[3]++
-				}
-			}
-			if(child['created'] <= xAxis[4]){
-				y1[4]++
-				if(child['completed'] >= xAxis[4]){
-					y2[4]++
-				}
+				count++
 			}
 		})
-		var today = this.startDate * 1000
-		xAxis = [
-			(new Date(today).getMonth()+1) + '/' + new Date(today).getDate() + '/' + new Date(today).getFullYear(),
-			(new Date(today+(this.now-this.startDate)/4).getMonth()+1) + '/' + new Date(today+(this.now-this.startDate)/4).getDate() + '/' + new Date(today+(this.now-this.startDate)/4).getFullYear(),
-			(new Date(today+2*((this.now-this.startDate)/4)).getMonth()+1) + '/' + new Date(today+2*((this.now-this.startDate)/4)).getDate() + '/' + new Date(today+2*((this.now-this.startDate)/4)).getFullYear(),
-			(new Date(today+3*((this.now-this.startDate)/4)).getMonth()+1) + '/' + new Date(today+3*((this.now-this.startDate)/4)).getDate() + '/' + new Date(today+3*((this.now-this.startDate)/4)).getFullYear(),
-			(new Date(this.now*1000).getMonth()+1) + '/' + new Date(this.now*1000).getDate() + '/' + new Date(this.now*1000).getFullYear()
-			]
 		console.log('xAxis=' + xAxis)
 		console.log('total y1=' + y1)
 		console.log('open y2=' + y2)
@@ -236,7 +221,6 @@ registerPlugin(proto(Gem, function(){
 // https://www.epochconverter.com/
 // var myDate = new Date( your epoch date *1000);
 
-// this.startDate = (new Date(ticket.subject.history[0].date * 1000).getMonth()+1) + '/' + new Date(ticket.subject.history[0].date * 1000).getDate() + '/' + new Date(ticket.subject.history[0].date * 1000).getFullYear()
 
 
 /***/ }),
