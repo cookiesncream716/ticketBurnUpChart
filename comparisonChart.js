@@ -38,7 +38,10 @@ registerPlugin(proto(Gem, function(){
 		// epoch time week = 604,800 seconds
 		// # of weeks
 		var weeks = Math.round((this.now-this.startDate)/604800)
-		console.log('weeks = ' + weeks)
+		// FOR BIWEEKLY PLOT - if there are more than 12 weeks
+		if(weeks > 12){
+			weeks = Math.round((this.now-this.startDate)/(604800*2))
+		}
 		// xAxis.length = weeks
 		var xAxis = [this.startDate]
 		var y1 = [0]
@@ -48,6 +51,7 @@ registerPlugin(proto(Gem, function(){
 			y1.push(0)
 			y2.push(0)
 		}
+
 		this.children.forEach(function(child){
 			console.log('child ' , child)
 			var count = 0
@@ -149,55 +153,3 @@ registerPlugin(proto(Gem, function(){
 // Linux TimeStamp 
 // https://www.epochconverter.com/
 // var myDate = new Date( your epoch date *1000);
-
-// create graph
-		// var xAxis = [
-		// 	this.startDate,
-		// 	(this.startDate + (this.now-this.startDate)/4),
-		// 	(this.startDate + 2*((this.now-this.startDate)/4)),
-		// 	(this.startDate + 3*((this.now-this.startDate)/4)),
-		// 	this.now
-		// 	]
-		// var y1 = [0, 0, 0, 0, 0]
-		// var y2 = [0, 0, 0, 0, 0]
-		// console.log('children ' , this.children)
-		// this.children.forEach(function(child){
-		// 	if(child['created'] <= xAxis[0]){
-		// 		y1[0]++
-		// 		if(child['completed'] >= xAxis[0]){
-		// 			y2[0]++
-		// 		}
-		// 	}
-		// 	if(child['created'] <= xAxis[1]){
-		// 		y1[1]++
-		// 		if(child['completed'] >= xAxis[1]){
-		// 			y2[1]++
-		// 		}
-		// 	}
-		// 	if(child['created'] <= xAxis[2]){
-		// 		y1[2]++
-		// 		if(child['completed'] >= xAxis[2]){
-		// 			y2[2]++
-		// 		}
-		// 	}
-		// 	if(child['created'] <= xAxis[3]){
-		// 		y1[3]++
-		// 		if(child['completed'] >= xAxis[3]){
-		// 			y2[3]++
-		// 		}
-		// 	}
-		// 	if(child['created'] <= xAxis[4]){
-		// 		y1[4]++
-		// 		if(child['completed'] >= xAxis[4]){
-		// 			y2[4]++
-		// 		}
-		// 	}
-		// })
-		// var start = this.startDate * 1000
-		// xAxis = [
-		// 	(new Date(start).getMonth()+1) + '/' + new Date(start).getDate() + '/' + new Date(start).getFullYear(),
-		// 	(new Date(start+(this.now-this.startDate)/4).getMonth()+1) + '/' + new Date(start+(this.now-this.startDate)/4).getDate() + '/' + new Date(start+(this.now-this.startDate)/4).getFullYear(),
-		// 	(new Date(start+2*((this.now-this.startDate)/4)).getMonth()+1) + '/' + new Date(start+2*((this.now-this.startDate)/4)).getDate() + '/' + new Date(start+2*((this.now-this.startDate)/4)).getFullYear(),
-		// 	(new Date(start+3*((this.now-this.startDate)/4)).getMonth()+1) + '/' + new Date(start+3*((this.now-this.startDate)/4)).getDate() + '/' + new Date(start+3*((this.now-this.startDate)/4)).getFullYear(),
-		// 	(new Date(this.now*1000).getMonth()+1) + '/' + new Date(this.now*1000).getDate() + '/' + new Date(this.now*1000).getFullYear()
-		// 	]
