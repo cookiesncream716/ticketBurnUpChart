@@ -119,11 +119,14 @@ registerPlugin(proto(Gem, function(){
 	}
 
 	this.createGraph = function(){
+		// epoch time day = 86,400 seconds
 		// epoch time week = 604,800 seconds
 		// # of weeks
 		// var weeks = Math.round((this.now-this.startDate)/604800)
 		var weeks
-		if(Math.round((this.now-this.startDate)/604800) < 13 ){		// WEEKLY PLOT
+		if(Math.round((this.now-this.startDate)/604800) < 3){	// DAILY PLOT
+			weeks = Math.round((this.now-this.startDate)/86400)
+		} else if(Math.round((this.now-this.startDate)/604800) < 13 ){		// WEEKLY PLOT
 			weeks = Math.round((this.now-this.startDate)/604800)
 		} else if(Math.round((this.now-this.startDate)/604800) < 26){	// BIWEEKLY PLOT
 			weeks = Math.round((this.now-this.startDate)/(604800*2))
@@ -195,12 +198,16 @@ registerPlugin(proto(Gem, function(){
 		}
 		var lines = [line1, line2]
 		var layout = {
-			title: 'Ticket Comparison',
 			xaxis: {title: 'Date'},
 			yaxis: {title: 'Tickets'},
 			margin: {t:23}
 		}
-		plotly.newPlot(this.chart, lines, layout)
+		var options = {
+			// scrollZoom: true,
+			displaylogo: false,
+			modeBarButtonsToRemove: ['sendDataToCloud', 'zoom2d','hoverClosestCartesian', 'lasso2d']
+		}
+		plotly.newPlot(this.chart, lines, layout, options)
 	}
 
 	this.createData = function(id){
@@ -227,9 +234,9 @@ registerPlugin(proto(Gem, function(){
 	this.getStyle = function(){
 		return Style({
 			Block: {
-				width: 700,
-				height: 450,
-				outline: '1px solid black'
+				width: '100%',
+				minHeight: 250,
+				paddingTop: 10
 			}
 		})
 	}
