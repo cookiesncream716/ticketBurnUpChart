@@ -119,13 +119,16 @@ registerPlugin(proto(Gem, function(){
 	}
 
 	this.createGraph = function(){
-		// FOR WEEKLY PLOT
 		// epoch time week = 604,800 seconds
 		// # of weeks
-		var weeks = Math.round((this.now-this.startDate)/604800)
-		// FOR BIWEEKLY PLOT - if there are more than 12 weeks
-		if(weeks > 12){
+		// var weeks = Math.round((this.now-this.startDate)/604800)
+		var weeks
+		if(Math.round((this.now-this.startDate)/604800) < 13 ){		// WEEKLY PLOT
+			weeks = Math.round((this.now-this.startDate)/604800)
+		} else if(Math.round((this.now-this.startDate)/604800) < 26){	// BIWEEKLY PLOT
 			weeks = Math.round((this.now-this.startDate)/(604800*2))
+		} else{															// MONTHLY PLOT
+			weeks = Math.round((this.now-this.startDate)/(604800*4))
 		}
 		// xAxis.length = weeks
 		var xAxis = [this.startDate]
