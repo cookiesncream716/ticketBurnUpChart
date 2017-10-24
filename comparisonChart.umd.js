@@ -144,10 +144,8 @@ registerPlugin(proto(Gem, function(){
 		}
 
 		this.children.forEach(function(child){
-			console.log('child ' , child)
 			var count = 0
 			while(count < weeks){
-				console.log('count ' + count)
 				if(child['created'] <= xAxis[count]){
 					y1[count]++
 					if(child['completed'] >= xAxis[count]){
@@ -157,15 +155,11 @@ registerPlugin(proto(Gem, function(){
 				count++
 			}
 		})
-		console.log('xAxis=' + xAxis)
-		console.log('total y1=' + y1)
-		console.log('open y2=' + y2)
 
 		var xAxisDate = []
 		for(var i=0; i<xAxis.length; i++){
 			xAxisDate.push((new Date(xAxis[i] * 1000).getMonth() + 1) + '/' + new Date(xAxis[i] * 1000).getDate() + '/' + new Date(xAxis[i] * 1000).getFullYear()) 
 		}
-
 		var line1 = {
 			x: xAxisDate,
 			y: y1,
@@ -231,23 +225,16 @@ registerPlugin(proto(Gem, function(){
 		})
 	}
 
-	this.getStyle = function(){
-		return Style({
-			Block: {
-				width: '100%',
-				minHeight: 250,
-				paddingTop: 10
-			}
-		})
-	}
+	// this.getStyle = function(){
+	// 	return Style({
+	// 		Block: {
+	// 			width: '100%',
+	// 			minHeight: 250,
+	// 			paddingTop: 10
+	// 		}
+	// 	})
+	// }
 }))
-
-// Total tickets vs Open tickets
-	// total - # of children tickets created by that date
-
-// Linux TimeStamp 
-// https://www.epochconverter.com/
-// var myDate = new Date( your epoch date *1000);
 
 
 /***/ }),
