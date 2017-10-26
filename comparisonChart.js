@@ -108,7 +108,6 @@ registerPlugin(proto(Gem, function(){
 			}
 		}
 		var lines = [line1, line2]
-		// ?? add title of project as title of graph
 		var layout = {
 			title: this.title,
 			xaxis: {title: 'Date'},
@@ -147,8 +146,8 @@ registerPlugin(proto(Gem, function(){
 	// this.getStyle = function(){
 	// 	return Style({
 	// 		Block: {
-	// 			// width: '100%',
-	// 			// minHeight: 250,
+	// 			width: '100%',
+	// 			minHeight: 250,
 	// 			paddingTop: 10
 	// 		}
 	// 	})
