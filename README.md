@@ -11,4 +11,4 @@ There are no special configuration options for this plugin. To use it, simply cr
 For more information about Tixit plugins go here: [http://docs.tixit.me/d/Plugin_API](http://docs.tixit.me/d/Plugin_API).
 
 ### License
-Released under the MIT license: [http://opensource.org/license/MIT](http://opensource.org/license/MIT
+Released under the MIT license: [http://opensource.org/license/MIT](http://opensource.org/license/MIT)
