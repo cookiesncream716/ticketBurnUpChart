@@ -1,8 +1,8 @@
 # Tixit: ticketComparisonChart
 
-![Example of ticketComparisonChart](https://github.com/cookiesncream716/ticketComparisonChart/blob/master/exChart.png?raw=true)
-
-<img src="https://github.com/cookiesncream716/ticketComparisonChart/blob/master/exChart.png?raw=true" width="50%" />
+<!-- ![Example of ticketComparisonChart](https://github.com/cookiesncream716/ticketComparisonChart/blob/master/exChart.png?raw=true)
+ -->
+<img src="https://github.com/cookiesncream716/ticketComparisonChart/blob/master/exChart.png?raw=true" width="70%" />
 
 This is a plugin for [Tixit](https://tixit.me/) that will display a chart comparing the number of total tickets to the number of open tickets in a project.
 
