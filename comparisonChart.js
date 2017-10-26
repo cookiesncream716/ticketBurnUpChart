@@ -106,6 +106,7 @@ registerPlugin(proto(Gem, function(){
 			}
 		}
 		var lines = [line1, line2]
+		// ?? add title of project as title of graph
 		var layout = {
 			xaxis: {title: 'Date'},
 			yaxis: {title: 'Tickets'},
