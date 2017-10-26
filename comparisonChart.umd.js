@@ -105,12 +105,14 @@ registerPlugin(proto(Gem, function(){
 		if(ticket.subject.parent === undefined){
 			// this is top level ticket
 			this.startDate = ticket.subject.history[0].date
+			this.title = ticket.subject.title
 			this.createData(ticket.subject._id).then(function(){
 				return that.createGraph()
 			}).done()
 		} else{
 			api.Ticket.loadOne(ticket.subject.parent).then(function(parent){
 				that.startDate = parent.subject.history[0].date
+				that.title = parent.subject.title
 				return that.createData(ticket.subject.parent)
 			}).then(function(){
 				return that.createGraph()
@@ -191,10 +193,12 @@ registerPlugin(proto(Gem, function(){
 			}
 		}
 		var lines = [line1, line2]
+		// ?? add title of project as title of graph
 		var layout = {
+			title: this.title,
 			xaxis: {title: 'Date'},
-			yaxis: {title: 'Tickets'},
-			margin: {t:23}
+			yaxis: {title: 'Tickets'}
+			// margin: {t: 43}
 		}
 		var options = {
 			// scrollZoom: true,
@@ -228,8 +232,8 @@ registerPlugin(proto(Gem, function(){
 	// this.getStyle = function(){
 	// 	return Style({
 	// 		Block: {
-	// 			width: '100%',
-	// 			minHeight: 250,
+	// 			// width: '100%',
+	// 			// minHeight: 250,
 	// 			paddingTop: 10
 	// 		}
 	// 	})
