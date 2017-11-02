@@ -21,6 +21,7 @@ registerPlugin(proto(Gem, function(){
 			// this is top level ticket
 			this.startDate = ticket.subject.history[0].date
 			this.title = ticket.subject.title
+			console.log('parent = ', ticket)
 			this.createData(ticket.subject._id).then(function(){
 				return that.createGraph()
 			}).done()
@@ -28,6 +29,7 @@ registerPlugin(proto(Gem, function(){
 			api.Ticket.loadOne(ticket.subject.parent).then(function(parent){
 				that.startDate = parent.subject.history[0].date
 				that.title = parent.subject.title
+				console.log('parent = ', parent)
 				return that.createData(ticket.subject.parent)
 			}).then(function(){
 				return that.createGraph()

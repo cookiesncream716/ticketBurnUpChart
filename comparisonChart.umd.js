@@ -106,6 +106,7 @@ registerPlugin(proto(Gem, function(){
 			// this is top level ticket
 			this.startDate = ticket.subject.history[0].date
 			this.title = ticket.subject.title
+			console.log('parent = ', ticket)
 			this.createData(ticket.subject._id).then(function(){
 				return that.createGraph()
 			}).done()
@@ -113,6 +114,7 @@ registerPlugin(proto(Gem, function(){
 			api.Ticket.loadOne(ticket.subject.parent).then(function(parent){
 				that.startDate = parent.subject.history[0].date
 				that.title = parent.subject.title
+				console.log('parent = ', parent)
 				return that.createData(ticket.subject.parent)
 			}).then(function(){
 				return that.createGraph()
@@ -193,7 +195,6 @@ registerPlugin(proto(Gem, function(){
 			}
 		}
 		var lines = [line1, line2]
-		// ?? add title of project as title of graph
 		var layout = {
 			title: this.title,
 			xaxis: {title: 'Date'},
@@ -232,8 +233,8 @@ registerPlugin(proto(Gem, function(){
 	// this.getStyle = function(){
 	// 	return Style({
 	// 		Block: {
-	// 			// width: '100%',
-	// 			// minHeight: 250,
+	// 			width: '100%',
+	// 			minHeight: 250,
 	// 			paddingTop: 10
 	// 		}
 	// 	})
