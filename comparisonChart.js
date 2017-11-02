@@ -40,31 +40,33 @@ registerPlugin(proto(Gem, function(){
 	this.createGraph = function(){
 		// epoch time day = 86,400 seconds
 		// epoch time week = 604,800 seconds
-		// # of weeks
-		// var weeks = Math.round((this.now-this.startDate)/604800)
-		var weeks
-		if(Math.round((this.now-this.startDate)/604800) < 3){	// DAILY PLOT
-			weeks = Math.round((this.now-this.startDate)/86400)
-		} else if(Math.round((this.now-this.startDate)/604800) < 13 ){		// WEEKLY PLOT
-			weeks = Math.round((this.now-this.startDate)/604800)
-		} else if(Math.round((this.now-this.startDate)/604800) < 26){	// BIWEEKLY PLOT
-			weeks = Math.round((this.now-this.startDate)/(604800*2))
-		} else{															// MONTHLY PLOT
-			weeks = Math.round((this.now-this.startDate)/(604800*4))
+		var week = 604800
+		var plots
+		if(Math.round((this.now-this.startDate)/week) < 3){	// DAILY PLOT
+			plots = Math.round((this.now-this.startDate)/86400)
+		} else if(Math.round((this.now-this.startDate)/week) < 13 ){ // WEEKLY PLOT
+			plots = Math.round((this.now-this.startDate)/week)
+		} else if(Math.round((this.now-this.startDate)/week) < 26){	// BIWEEKLY PLOT
+			plots = Math.round((this.now-this.startDate)/(week*2))
+		} else{														// MONTHLY PLOT
+			plots = Math.round((this.now-this.startDate)/(week*4))
 		}
-		// xAxis.length = weeks
+
+		// Create x and y axis for Markers
+		// xAxis.length = plots
 		var xAxis = [this.startDate]
 		var y1 = [0]
 		var y2 = [0]
-		for(var x=1; x<weeks; x++){
-			xAxis.push(this.startDate + x*((this.now-this.startDate)/(weeks-1)))
+		// put dates in xAxis and make y axis the right length
+		for(var x=1; x<plots; x++){
+			xAxis.push(this.startDate + x*((this.now-this.startDate)/(plots-1)))
 			y1.push(0)
 			y2.push(0)
 		}
-
+		// find number of tickets and wether they are open or closed
 		this.children.forEach(function(child){
 			var count = 0
-			while(count < weeks){
+			while(count < plots){
 				if(child['created'] <= xAxis[count]){
 					y1[count]++
 					if(child['completed'] >= xAxis[count]){
@@ -74,7 +76,8 @@ registerPlugin(proto(Gem, function(){
 				count++
 			}
 		})
-
+		
+		// Make xAxis dates readable
 		var xAxisDate = []
 		for(var i=0; i<xAxis.length; i++){
 			xAxisDate.push((new Date(xAxis[i] * 1000).getMonth() + 1) + '/' + new Date(xAxis[i] * 1000).getDate() + '/' + new Date(xAxis[i] * 1000).getFullYear()) 
