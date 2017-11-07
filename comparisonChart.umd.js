@@ -162,7 +162,7 @@ registerPlugin(proto(Gem, function(){
 						}
 					}
 				} else{
-					data['completed'] = that.now + 1000
+					data['completed'] = that.now + 100000
 				}
 				that.children.push(data)
 			})
@@ -205,20 +205,23 @@ registerPlugin(proto(Gem, function(){
 		}
 
 		// Find number of tickets and wether they are open or closed
-		// problem - xAxis[0] is date ticket created but any child tickets created on same day will still have a later created date and if child ticket completed on same day
+		// problem - xAxis[0] is date ticket created but any descendants created on same day will still have a later created date and  same if descendant completed on same day
+		// ?? solution - add 6 hours to xAxis when comparing times
+		// epoch 6 hours = 6 * 3600
+		var hours = 21600
 		if(xAxis.length === 1){		//break case
 			y1[0] = this.children.length
 			this.children.forEach(function(child){
-				if(child['completed'] >= xAxis[0]){
+				if(child['completed'] >= (xAxis[0] + hours)){
 					y2[0]++
 				}
 			})
 		} else{
 			this.children.forEach(function(child){
 				xAxis.forEach(function(x, index){
-					if(child['created'] <= x){
+					if(child['created'] <= (x + hours)){
 						y1[index]++
-						if(child['completed'] >= x){
+						if(child['completed'] >= (x + hours)){
 							y2[index]++
 						}
 					}
