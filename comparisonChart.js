@@ -16,50 +16,62 @@ registerPlugin(proto(Gem, function(){
 		// created date - history[0].date
 		// completed date - (if archived true or if done true) date in history that done went from false to true
 		this.now = Math.round(new Date().getTime()/1000.0)
-
-		// Displays Ticket's immediate children
 		this.startDate = ticket.subject.history[0].date
 		this.title = ticket.subject.title
-		this.createData(ticket.subject._id).then(function(){
+
+		// Displays Ticket's immediate children
+		// this.createData(ticket.subject._id).then(function(){
+		// 	return that.createGraph()
+		// }).done()
+
+		// Display all of Ticket's descendents
+		this.createDataAll(ticket.subject._id).then(function(){
 			return that.createGraph()
 		}).done()
-
-
-		// if(ticket.subject.parent === undefined){
-		// 	// this is top level ticket
-		// 	this.startDate = ticket.subject.history[0].date
-		// 	this.title = ticket.subject.title
-		// 	console.log('parent = ', ticket)
-		// 	this.createData(ticket.subject._id).then(function(){
-		// 		return that.createGraph()
-		// 	}).done()
-		// } else{
-		// 	api.Ticket.loadOne(ticket.subject.parent).then(function(parent){
-		// 		that.startDate = parent.subject.history[0].date
-		// 		that.title = parent.subject.title
-		// 		console.log('parent = ', parent)
-		// 		return that.createData(ticket.subject.parent)
-		// 	}).then(function(){
-		// 		return that.createGraph()
-		// 	}).done()
-		// }
 	}
 
-	this.createData = function(id){
+	// this.createData = function(id){
+	// 	var that = this
+	// 	return this.api.Ticket.search({parent: id}).then(function(childTickets){
+	// 		console.log('child tickets ', childTickets)
+	// 		childTickets.forEach(function(child){
+	// 			var data = {}
+	// 			data['created'] = child.subject.history[0].date
+	// 			if(child.subject.done === true || child.subject.archived === true){
+	// 				// not sure this is how history should work
+	// 				if(child.subject.history.length === 1){
+	// 					data['completed'] = child.subject.history[0].date
+	// 				}else {
+	// 					for(var i=child.subject.history.length-1; i>=0; i--){
+	// 						if(child.subject.history[i].field === 'done' || child.subject.history[i].field === 'archived'){
+	// 							data['completed'] = child.subject.history[i].date
+	// 							break
+	// 						}
+	// 					}
+	// 				}
+	// 			} else{
+	// 				data['completed'] = that.now + 1000
+	// 			}
+	// 			that.children.push(data)
+	// 		})
+	// 		console.log('that.children ', that.children)
+	// 	})
+	// }
+
+	this.createDataAll = function(id){
 		var that = this
-		return this.api.Ticket.search({parent: id}).then(function(childTickets){
-			console.log('child tickets ', childTickets)
-			childTickets.forEach(function(child){
+		return this.api.Ticket.search({$or: [{parent: id},{ancestry: id}]}).then(function(allTickets){
+			console.log('all descendents ', allTickets)
+			allTickets.forEach(function(aTicket){
 				var data = {}
-				data['created'] = child.subject.history[0].date
-				if(child.subject.done === true || child.subject.archived === true){
-					// not sure this is how history should work
-					if(child.subject.history.length === 1){
-						data['completed'] = child.subject.history[0].date
-					}else {
-						for(var i=child.subject.history.length-1; i>=0; i--){
-							if(child.subject.history[i].field === 'done' || child.subject.history[i].field === 'archived'){
-								data['completed'] = child.subject.history[i].date
+				data['created'] = aTicket.subject.history[0].date
+				if(aTicket.subject.done === true || aTicket.subject.archived === true){
+					if(aTicket.subject.history.length === 1){
+						data['completed'] = aTicket.subject.history[0].date
+					} else{
+						for(var i=aTicket.subject.history.length-1; i>=0; i--){
+							if(aTicket.subject.history[i].field === 'done' || aTicket.subject.history[i].field === 'archived'){
+								data['completed'] = aTicket.subject.history[i].date
 								break
 							}
 						}
