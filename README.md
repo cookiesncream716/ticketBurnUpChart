@@ -1,4 +1,4 @@
-# Tixit: ticketComparisonChart
+# Tixit: ticketBurnUpChart
 
 <!-- ![Example of ticketComparisonChart](https://github.com/cookiesncream716/ticketComparisonChart/blob/master/exChart.png?raw=true)
  -->
