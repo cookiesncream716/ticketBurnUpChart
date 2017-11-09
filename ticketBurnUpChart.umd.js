@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["comparisonChart"] = factory();
+		exports["ticketBurnUpChart"] = factory();
 	else
-		root["comparisonChart"] = factory();
+		root["ticketBurnUpChart"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -75,9 +75,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/*!****************************!*\
-  !*** ./comparisonChart.js ***!
-  \****************************/
+/*!******************************!*\
+  !*** ./ticketBurnUpChart.js ***!
+  \******************************/
 /*! dynamic exports provided */
 /*! all exports used */
 /***/ (function(module, exports, __webpack_require__) {
